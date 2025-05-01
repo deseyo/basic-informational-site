@@ -1,23 +1,25 @@
-const http = require('http');
-const fs = require('node:fs/promises');
+const express = require('express');
+const path = require('path');
+const app = express();
 
-http.createServer(async (req, res) => {
-  let statusCode = 200;
-  let data;
-  try {
-    const arg = req.url.split('/')[1];
-    if (arg === '') {
-      data = await fs.readFile('index.html');
-    }
-    else {
-      data = await fs.readFile(`${arg}.html`);
-    }
-  }
-  catch (err) {
-    statusCode = 404;
-    data = await fs.readFile('404.html');
-  }
-  res.writeHead(statusCode, {'content-type': 'text/html'})
-  res.write(data);
-  res.end();
-}).listen('8080')
+app.get('/', async (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/about', async (req, res) => {
+  res.sendFile(path.join(__dirname, 'about.html'));
+});
+
+
+app.get('/contact-me', async (req, res) => {
+  res.sendFile(path.join(__dirname, 'contact-me.html'));
+});
+
+app.use((req, res) => {
+  res.status(404).send('404 Error');
+})
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`)
+})
